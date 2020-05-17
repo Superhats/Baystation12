@@ -85,7 +85,9 @@ datum/admins/proc/DB_ban_record(var/bantype, var/mob/banned_mob, var/duration = 
 	var/ip
 
 	if(ismob(banned_mob))
-		ckey = banned_mob.ckey
+		ckey = LAST_CKEY(banned_mob)
+		computerid = banned_mob.computer_id
+		ip = banned_mob.lastKnownIP
 		if(banned_mob.client)
 			computerid = banned_mob.client.computer_id
 			ip = banned_mob.client.address
@@ -413,13 +415,13 @@ datum/admins/proc/DB_ban_unban_by_id(var/id)
 				if(playercid)
 					cidsearch  = "AND computerid = '[playercid]' "
 			else
-				if(adminckey && lentext(adminckey) >= 3)
+				if(adminckey && length(adminckey) >= 3)
 					adminsearch = "AND a_ckey LIKE '[adminckey]%' "
-				if(playerckey && lentext(playerckey) >= 3)
+				if(playerckey && length(playerckey) >= 3)
 					playersearch = "AND ckey LIKE '[playerckey]%' "
-				if(playerip && lentext(playerip) >= 3)
+				if(playerip && length(playerip) >= 3)
 					ipsearch  = "AND ip LIKE '[playerip]%' "
-				if(playercid && lentext(playercid) >= 7)
+				if(playercid && length(playercid) >= 7)
 					cidsearch  = "AND computerid LIKE '[playercid]%' "
 
 			if(dbbantype)
@@ -515,4 +517,4 @@ datum/admins/proc/DB_ban_unban_by_id(var/id)
 
 			output += "</table></div>"
 
-	usr << browse(output,"window=lookupbans;size=900x700")
+	show_browser(usr, output,"window=lookupbans;size=900x700")

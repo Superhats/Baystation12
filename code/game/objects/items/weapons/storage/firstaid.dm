@@ -124,6 +124,7 @@
 		/obj/item/weapon/storage/med_pouch/burn,
 		/obj/item/weapon/storage/med_pouch/oxyloss,
 		/obj/item/weapon/storage/med_pouch/toxin,
+		/obj/item/weapon/storage/med_pouch/radiation,
 		)
 
 /obj/item/weapon/storage/firstaid/surgery
@@ -180,6 +181,7 @@
 	allow_quick_gather = 1
 	use_to_pickup = 1
 	use_sound = 'sound/effects/storage/pillbottle.ogg'
+	matter = list(MATERIAL_PLASTIC = 250)
 	var/wrapper_color
 	var/label
 
@@ -199,7 +201,27 @@
 			remove_from_storage(P)
 			P.attack(target,user)
 			return 1
-	
+
+/obj/item/weapon/storage/pill_bottle/attack_self(mob/living/user)
+	if(user.get_inactive_hand())
+		to_chat(user, "<span class='notice'>You need an empty hand to take something out.</span>")
+		return
+	if(contents.len)
+		var/obj/item/I = contents[1]
+		if(!remove_from_storage(I,user))
+			return
+		if(user.put_in_inactive_hand(I))
+			to_chat(user, "<span class='notice'>You take \the [I] out of \the [src].</span>")
+			if(iscarbon(user))
+				var/mob/living/carbon/C = user
+				C.swap_hand()
+		else
+			I.dropInto(loc)
+			to_chat(user, "<span class='notice'>You fumble around with \the [src] and drop \the [I] on the floor.</span>")
+	else
+		to_chat(user, "<span class='warning'>\The [src] is empty.</span>")
+
+
 /obj/item/weapon/storage/pill_bottle/Initialize()
 	. = ..()
 	update_icon()
@@ -329,4 +351,24 @@
 			/obj/item/weapon/reagent_containers/pill/dexalin = 2,
 			/obj/item/weapon/reagent_containers/pill/kelotane = 2,
 			/obj/item/weapon/reagent_containers/pill/hyronalin
+		)
+
+/obj/item/weapon/storage/firstaid/light
+	name = "light first-aid kit"
+	desc = "It's a small emergency medical kit."
+	icon_state = "light_firstaid"
+	storage_slots = 5
+	w_class = ITEM_SIZE_SMALL
+	max_w_class = ITEM_SIZE_SMALL
+	startswith = list(
+	/obj/item/clothing/gloves/latex/nitrile,
+	/obj/item/weapon/reagent_containers/hypospray/autoinjector,
+	/obj/item/weapon/reagent_containers/hypospray/autoinjector/pouch_auto/deletrathol,
+	/obj/item/weapon/reagent_containers/hypospray/autoinjector/pouch_auto/dexalin,
+	/obj/item/stack/medical/bruise_pack
+		)
+	can_hold = list(
+		/obj/item/clothing/gloves/latex,
+		/obj/item/weapon/reagent_containers/hypospray/autoinjector,
+		/obj/item/stack/medical/bruise_pack
 		)

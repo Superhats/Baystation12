@@ -209,7 +209,7 @@
 			dt = 15
 		addtimer(CALLBACK(attached_grenade, /obj/item/weapon/grenade.proc/activate), dt)
 		var/atom/holder = loc
-		message_admins("activated a grenade assembly. Last touches: Assembly: [holder.fingerprintslast] Circuit: [fingerprintslast] Grenade: [attached_grenade.fingerprintslast]")
+		log_and_message_admins("activated a grenade assembly. Last touches: Assembly: [holder.fingerprintslast] Circuit: [fingerprintslast] Grenade: [attached_grenade.fingerprintslast]")
 
 // These procs do not relocate the grenade, that's the callers responsibility
 /obj/item/integrated_circuit/manipulation/grenade/proc/attach_grenade(var/obj/item/weapon/grenade/G)
@@ -552,7 +552,6 @@
 	inputs = list("teleporter", "rift direction")
 	outputs = list()
 	activators = list("open rift" = IC_PINTYPE_PULSE_IN)
-	spawn_flags = IC_SPAWN_RESEARCH
 	action_flags = IC_ACTION_LONG_RANGE
 
 	origin_tech = list(TECH_MAGNET = 1, TECH_BLUESPACE = 3)
@@ -561,7 +560,8 @@
 /obj/item/integrated_circuit/manipulation/bluespace_rift/do_work()
 	var/obj/machinery/computer/teleporter/tporter = get_pin_data_as_type(IC_INPUT, 1, /obj/machinery/computer/teleporter)
 	var/step_dir = get_pin_data(IC_INPUT, 2)
-	if(!(get(z) in GetConnectedZlevels(get_z(tporter))))
+
+	if(!AreConnectedZLevels(get_z(src), get_z(tporter)))
 		tporter = null
 
 	var/turf/rift_location = get_turf(src)
@@ -656,3 +656,81 @@
 /obj/item/integrated_circuit/manipulation/ai/Destroy()
 	unload_ai()
 	return ..()
+
+/obj/item/integrated_circuit/manipulation/anchoring
+	name = "anchoring bolts"
+	desc = "Pop-out anchoring bolts which can secure an assembly to the floor."
+
+	outputs = list(
+		"enabled" = IC_PINTYPE_BOOLEAN
+	)
+	activators = list(
+		"toggle" = IC_PINTYPE_PULSE_IN,
+		"on toggle" = IC_PINTYPE_PULSE_OUT
+	)
+
+	complexity = 8
+	cooldown_per_use = 2 SECOND
+	power_draw_per_use = 50
+	spawn_flags = IC_SPAWN_DEFAULT
+	origin_tech = list(TECH_ENGINEERING = 2)
+
+/obj/item/integrated_circuit/manipulation/anchoring/do_work(ord)
+	if(!isturf(assembly.loc))
+		return
+
+	// Doesn't work with anchorable assemblies
+	if(assembly.circuit_flags & IC_FLAG_ANCHORABLE)
+		visible_message("<span class='warning'>\The [get_object()]'s anchoring bolt circuitry blinks red. The preinstalled assembly anchoring bolts are in the way of the pop-out bolts!</span>")
+		return
+
+	if(ord == 1)
+		assembly.anchored = !assembly.anchored
+
+		visible_message(
+			assembly.anchored ? \
+			"<span class='notice'>\The [get_object()] deploys a set of anchoring bolts!</span>" \
+			: \
+			"<span class='notice'>\The [get_object()] retracts its anchoring bolts</span>"
+		)
+
+		set_pin_data(IC_OUTPUT, 1, assembly.anchored)
+		push_data()
+		activate_pin(2)
+
+/obj/item/integrated_circuit/manipulation/hatchlock
+	name = "maintenance hatch lock"
+	desc = "An electronically controlled lock for the assembly's maintenance hatch."
+	extended_desc = "WARNING: If you lock the hatch with no circuitry to reopen it, there is no way to open the hatch again!"
+	icon_state = "hatch_lock"
+
+	outputs = list(
+		"enabled" = IC_PINTYPE_BOOLEAN
+	)
+	activators = list(
+		"toggle" = IC_PINTYPE_PULSE_IN,
+		"on toggle" = IC_PINTYPE_PULSE_OUT
+	)
+
+	complexity = 4
+	cooldown_per_use = 2 SECOND
+	power_draw_per_use = 50
+	spawn_flags = IC_SPAWN_DEFAULT
+	origin_tech = list(TECH_ENGINEERING = 2)
+
+	var/lock_enabled = FALSE
+
+/obj/item/integrated_circuit/manipulation/hatchlock/do_work(ord)
+	if(ord == 1)
+		lock_enabled = !lock_enabled
+
+		visible_message(
+			lock_enabled ? \
+			"<span class='notice'>\The [get_object()] whirrs. The screws are now covered.</span>" \
+			: \
+			"<span class='notice'>\The [get_object()] whirrs. The screws are now exposed!</span>"
+		)
+
+		set_pin_data(IC_OUTPUT, 1, lock_enabled)
+		push_data()
+		activate_pin(2)

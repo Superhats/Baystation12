@@ -1,5 +1,4 @@
 /mob/living/carbon/human
-	plane = HUMAN_PLANE
 
 	//Hair colour and style
 	var/r_hair = 0
@@ -111,3 +110,5 @@
 	var/became_younger
 
 	var/list/descriptors
+
+	var/last_smelt = 0

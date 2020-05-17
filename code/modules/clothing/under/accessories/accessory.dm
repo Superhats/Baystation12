@@ -97,6 +97,11 @@
 		return	//we aren't an object on the ground so don't call parent
 	..()
 
+/obj/item/clothing/accessory/get_pressure_weakness(pressure,zone)
+	if(body_parts_covered & zone)
+		return ..()
+	return 1
+
 //Necklaces
 /obj/item/clothing/accessory/necklace
 	name = "necklace"
@@ -115,3 +120,9 @@
 	name = "scarf"
 	desc = "A stylish scarf. The perfect winter accessory for those with a keen fashion sense, and those who just can't handle a cold breeze on their necks."
 	icon_state = "whitescarf"
+
+//Bracelets
+/obj/item/clothing/accessory/bracelet
+	name = "bracelet"
+	desc = "A simple bracelet with a clasp."
+	icon_state = "bracelet"

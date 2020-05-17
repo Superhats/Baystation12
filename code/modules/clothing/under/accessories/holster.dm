@@ -11,7 +11,7 @@
 
 /obj/item/clothing/accessory/storage/holster/Initialize()
 	. = ..()
-	set_extension(src, /datum/extension/holster, /datum/extension/holster, hold, sound_in, sound_out, can_holster)
+	set_extension(src, /datum/extension/holster, hold, sound_in, sound_out, can_holster)
 
 /obj/item/clothing/accessory/storage/holster/attackby(obj/item/W as obj, mob/user as mob)
 	var/datum/extension/holster/H = get_extension(src, /datum/extension/holster)
@@ -82,3 +82,16 @@
 	can_holster = list(/obj/item/weapon/material/hatchet/machete)
 	sound_in = 'sound/effects/holster/sheathin.ogg'
 	sound_out = 'sound/effects/holster/sheathout.ogg'
+
+/obj/item/clothing/accessory/storage/holster/knife
+	name = "leather knife sheath"
+	desc = "A synthetic leather knife sheath which you can strap on your leg."
+	icon_state = "sheath_leather"
+	can_holster = list(/obj/item/weapon/material/knife)
+	sound_in = 'sound/effects/holster/sheathin.ogg'
+	sound_out = 'sound/effects/holster/sheathout.ogg'
+
+/obj/item/clothing/accessory/storage/holster/knife/polymer
+	name = "polymer knife sheath"
+	desc = "A rigid polymer sheath which you can strap on your leg."
+	icon_state = "sheath_polymer"

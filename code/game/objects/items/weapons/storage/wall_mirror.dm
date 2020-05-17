@@ -33,7 +33,7 @@
 	if(shattered)
 		to_chat(user, "<spawn class='notice'>You enter the key combination for the style you want on the panel, but the nanomachines inside \the [src] refuse to come out.")
 		return
-	open_mirror_ui(user, ui_users, "SalonPro Nano-Mirror&trade;")
+	open_mirror_ui(user, ui_users, "SalonPro Nano-Mirror&trade;", mirror = src)
 
 /obj/item/weapon/storage/mirror/proc/shatter()
 	if(shattered)	return
@@ -77,33 +77,6 @@
 	clear_ui_users(ui_users)
 	. = ..()
 
-// The following mirror is ~special~.
-/obj/item/weapon/storage/mirror/raider
-	name = "cracked mirror"
-	desc = "Something seems strange about this old, dirty mirror. Your reflection doesn't look like you remember it."
-	icon_state = "mirror_broke"
-	shattered = 1
-
-/obj/item/weapon/storage/mirror/raider/use_mirror(mob/living/carbon/human/user)
-	if(istype(get_area(src),/area/syndicate_mothership))
-		if(istype(user) && user.mind && user.mind.special_role == "Raider" && user.species.name != SPECIES_VOX && is_alien_whitelisted(user, SPECIES_VOX))
-			var/choice = input("Do you wish to become a true Vox of the Shoal? This is not reversible.") as null|anything in list("No","Yes")
-			if(choice && choice == "Yes")
-				var/mob/living/carbon/human/vox/vox = new(get_turf(src),SPECIES_VOX)
-				vox.gender = user.gender
-				GLOB.raiders.equip(vox)
-				if(user.mind)
-					user.mind.transfer_to(vox)
-				spawn(1)
-					var/newname = sanitizeSafe(input(vox,"Enter a name, or leave blank for the default name.", "Name change","") as text, MAX_NAME_LEN)
-					if(!newname || newname == "")
-						var/decl/cultural_info/voxculture = SSculture.get_culture(CULTURE_VOX_RAIDER)
-						newname = voxculture.get_random_name()
-					vox.real_name = newname
-					vox.SetName(vox.real_name)
-					GLOB.raiders.update_access(vox)
-				qdel(user)
-
 /obj/item/weapon/mirror
 	name = "mirror"
 	desc = "A SalonPro Nano-Mirror(TM) brand mirror! Now a portable version."
@@ -112,20 +85,20 @@
 	var/list/ui_users
 
 /obj/item/weapon/mirror/attack_self(mob/user as mob)
-	open_mirror_ui(user, ui_users, "SalonPro Nano-Mirror&trade;", APPEARANCE_HAIR)
+	open_mirror_ui(user, ui_users, "SalonPro Nano-Mirror&trade;", APPEARANCE_HAIR, src)
 
 /obj/item/weapon/mirror/Destroy()
 	clear_ui_users(ui_users)
 	. = ..()
 
-/proc/open_mirror_ui(var/mob/user, var/ui_users, var/title, var/flags)
+/proc/open_mirror_ui(var/mob/user, var/ui_users, var/title, var/flags, var/obj/item/mirror)
 	if(!ishuman(user))
 		return
 
 	var/W = weakref(user)
 	var/datum/nano_module/appearance_changer/AC = LAZYACCESS(ui_users, W)
 	if(!AC)
-		AC = new(src, user)
+		AC = new(mirror, user)
 		AC.name = title
 		if(flags)
 			AC.flags = flags

@@ -188,7 +188,7 @@
 				qdel(src)
 				return
 			else if(seed.chems)
-				if(istype(W,/obj/item/weapon/material/hatchet || istype(W,/obj/item/weapon/material/knife)))
+				if(isHatchet(W))
 					if(!isnull(seed.chems[/datum/reagent/woodpulp]))
 						user.visible_message("<span class='notice'>\The [user] makes planks out of \the [src].</span>")
 						new /obj/item/stack/material/wood(user.loc)
@@ -217,7 +217,7 @@
 					to_chat(user, "You slice up \the [src].")
 					var/slices = rand(3,5)
 					var/reagents_to_transfer = round(reagents.total_volume/slices)
-					for(var/i=i;i<=slices;i++)
+					for(var/i in 1 to slices)
 						var/obj/item/weapon/reagent_containers/food/snacks/fruit_slice/F = new(get_turf(src),seed)
 						if(reagents_to_transfer) reagents.trans_to_obj(F,reagents_to_transfer)
 					qdel(src)

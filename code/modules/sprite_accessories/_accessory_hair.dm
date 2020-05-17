@@ -15,7 +15,7 @@
 	icon_state = "bald"
 	gender = MALE
 	species_allowed = list(SPECIES_HUMAN,SPECIES_UNATHI,SPECIES_VOX)
-	flags = VERY_SHORT
+	flags = VERY_SHORT | HAIR_BALD
 
 /datum/sprite_accessory/hair/short
 	name = "Short Hair"	  // try to capatilize the names please~
@@ -719,8 +719,13 @@
 	name = "Gentle 2"
 	icon_state = "hair_gentle2"
 	flags = HAIR_TIEABLE
-	
+
 /datum/sprite_accessory/hair/gentle2long
 	name = "Gentle 2 Long"
 	icon_state = "hair_gentle2long"
+	flags = HAIR_TIEABLE
+
+/datum/sprite_accessory/hair/trimrsidecut
+	name = "Trimmed Right Sidecut"
+	icon_state = "hair_rightside_trim"
 	flags = HAIR_TIEABLE

@@ -126,7 +126,7 @@ var/list/_client_preferences_by_type
 /datum/client_preference/language_display
 	description = "Display Language Names"
 	key = "LANGUAGE_DISPLAY"
-	options = list(GLOB.PREF_FULL, GLOB.PREF_SHORTHAND, GLOB.PREF_OFF)
+	options = list(GLOB.PREF_SHORTHAND, GLOB.PREF_FULL, GLOB.PREF_OFF)
 
 /datum/client_preference/ghost_follow_link_length
 	description ="Ghost Follow Links"
@@ -172,16 +172,6 @@ var/list/_client_preferences_by_type
 	key = "SHOW_PROGRESS"
 	options = list(GLOB.PREF_SHOW, GLOB.PREF_HIDE)
 
-/datum/client_preference/tgui_style
-	description ="tgui Style"
-	key = "TGUI_FANCY"
-	options = list(GLOB.PREF_FANCY, GLOB.PREF_PLAIN)
-
-/datum/client_preference/tgui_monitor
-	description ="tgui Monitor"
-	key = "TGUI_MONITOR"
-	options = list(GLOB.PREF_PRIMARY, GLOB.PREF_ALL)
-
 /datum/client_preference/browser_style
 	description = "Fake NanoUI Browser Style"
 	key = "BROWSER_STYLED"
@@ -206,7 +196,7 @@ var/list/_client_preferences_by_type
 	key = "SHOW_CREDITS"
 
 /datum/client_preference/show_ckey_credits
-	description = "Show Ckey in End Credits"
+	description = "Show Ckey in End Credits/Special Role List"
 	key = "SHOW_CKEY_CREDITS"
 	options = list(GLOB.PREF_HIDE, GLOB.PREF_SHOW)
 

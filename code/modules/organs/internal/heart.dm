@@ -8,7 +8,8 @@
 	var/heartbeat = 0
 	var/beat_sound = 'sound/effects/singlebeat.ogg'
 	var/tmp/next_blood_squirt = 0
-	relative_size = 15
+	damage_reduction = 0.7
+	relative_size = 5
 	max_damage = 45
 	var/open
 	var/list/external_pump
@@ -153,7 +154,7 @@
 				if(bleed_amount)
 					if(open_wound)
 						blood_max += bleed_amount
-						do_spray += "the [temp.artery_name] in \the [owner]'s [temp.name]"
+						do_spray += "[temp.name]"
 					else
 						owner.vessel.remove_reagent(/datum/reagent/blood, bleed_amount)
 
@@ -169,9 +170,16 @@
 			blood_max *= 0.8
 
 		if(world.time >= next_blood_squirt && istype(owner.loc, /turf) && do_spray.len)
-			owner.visible_message("<span class='danger'>Blood squirts from [pick(do_spray)]!</span>")
-			// It becomes very spammy otherwise. Arterial bleeding will still happen outside of this block, just not the squirt effect.
-			next_blood_squirt = world.time + 100
+			var/spray_organ = pick(do_spray)
+			owner.visible_message(
+				SPAN_DANGER("Blood sprays out from \the [owner]'s [spray_organ]!"),
+				FONT_HUGE(SPAN_DANGER("Blood sprays out from your [spray_organ]!"))
+			)
+			owner.Stun(1)
+			owner.eye_blurry = 2
+
+			//AB occurs every heartbeat, this only throttles the visible effect
+			next_blood_squirt = world.time + 80
 			var/turf/sprayloc = get_turf(owner)
 			blood_max -= owner.drip(ceil(blood_max/3), sprayloc)
 			if(blood_max > 0)
@@ -212,3 +220,6 @@
 			pulsesound = "extremely fast and faint"
 
 	. = "[pulsesound] pulse"
+
+/obj/item/organ/internal/heart/get_mechanical_assisted_descriptor()
+	return "pacemaker-assisted [name]"

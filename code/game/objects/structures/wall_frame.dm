@@ -16,6 +16,7 @@
 	var/health = 100
 	var/paint_color
 	var/stripe_color
+	rad_resistance_modifier = 0.5
 
 	blend_objects = list(/obj/machinery/door, /turf/simulated/wall) // Objects which to blend with
 	noblend_objects = list(/obj/machinery/door/window)
@@ -33,10 +34,7 @@
 	update_icon()
 
 /obj/structure/wall_frame/examine(mob/user)
-	. = ..(user)
-
-	if(!.)
-		return
+	. = ..()
 
 	if(health == material.integrity)
 		to_chat(user, "<span class='notice'>It seems to be in fine condition.</span>")
@@ -81,11 +79,19 @@
 		playsound(src.loc, 'sound/items/Ratchet.ogg', 100, 1)
 		to_chat(user, "<span class='notice'>Now disassembling the low wall...</span>")
 		if(do_after(user, 40,src))
-			if(!src) return
 			to_chat(user, "<span class='notice'>You dissasembled the low wall!</span>")
 			dismantle()
 
-	return  ..()
+	else if(istype(W, /obj/item/weapon/gun/energy/plasmacutter))
+		var/obj/item/weapon/gun/energy/plasmacutter/cutter = W
+		if(!cutter.slice(user))
+			return
+		playsound(src.loc, 'sound/items/Welder.ogg', 100, 1)
+		to_chat(user, "<span class='notice'>Now slicing through the low wall...</span>")
+		if(do_after(user, 20,src))
+			to_chat(user, "<span class='warning'>You have sliced through the low wall!</span>")
+			dismantle()
+	return ..()
 
 /obj/structure/wall_frame/CanPass(atom/movable/mover, turf/target, height=0, air_group=0)
 	if(air_group || (height==0)) return 1
@@ -140,12 +146,15 @@
 	take_damage(damage)
 	return
 
-/obj/structure/wall_frame/hitby(AM as mob|obj, var/speed=THROWFORCE_SPEED_DIVISOR)
+/obj/structure/wall_frame/hitby(AM as mob|obj, var/datum/thrownthing/TT)
 	..()
-	if(ismob(AM))
-		return
-	var/obj/O = AM
-	var/tforce = O.throwforce * (speed/THROWFORCE_SPEED_DIVISOR)
+	var/tforce = 0
+	if(ismob(AM)) // All mobs have a multiplier and a size according to mob_defines.dm
+		var/mob/I = AM
+		tforce = I.mob_size * (TT.speed/THROWFORCE_SPEED_DIVISOR)
+	else
+		var/obj/O = AM
+		tforce = O.throwforce * (TT.speed/THROWFORCE_SPEED_DIVISOR)
 	if (tforce < 15)
 		return
 	take_damage(tforce)
@@ -156,7 +165,7 @@
 		dismantle()
 
 /obj/structure/wall_frame/proc/dismantle()
-	new /obj/item/stack/material/steel(get_turf(src))
+	new /obj/item/stack/material/steel(get_turf(src), 3)
 	qdel(src)
 
 //Subtypes

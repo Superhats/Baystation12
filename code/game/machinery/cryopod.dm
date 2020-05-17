@@ -3,7 +3,6 @@
  * Stealing a lot of concepts/code from sleepers due to massive laziness.
  * The despawn tick will only fire if it's been more than time_till_despawned ticks
  * since time_entered, which is world.time when the occupant moves in.
- * ~ Zuhayr
  */
 
 
@@ -14,7 +13,6 @@
 	desc = "An interface between crew and the cryogenic storage oversight systems."
 	icon = 'icons/obj/Cryogenic2.dmi'
 	icon_state = "cellconsole"
-	circuit = /obj/item/weapon/circuitboard/cryopodcontrol
 	density = 0
 	interact_offline = 1
 	var/mode = null
@@ -33,20 +31,16 @@
 	desc = "An interface between crew and the robotic storage systems."
 	icon = 'icons/obj/robot_storage.dmi'
 	icon_state = "console"
-	circuit = /obj/item/weapon/circuitboard/robotstoragecontrol
 
 	storage_type = "cyborgs"
 	storage_name = "Robotic Storage Control"
 	allow_items = 0
 
-/obj/machinery/computer/cryopod/attack_ai()
-	src.attack_hand()
+/obj/machinery/computer/cryopod/interface_interact(mob/user)
+	interact(user)
+	return TRUE
 
-/obj/machinery/computer/cryopod/attack_hand(mob/user = usr)
-	if(stat & (NOPOWER|BROKEN))
-		return
-	..()
-
+/obj/machinery/computer/cryopod/interact(mob/user)
 	user.set_machine(src)
 
 	var/dat
@@ -59,7 +53,7 @@
 		dat += "<a href='?src=\ref[src];item=1'>Recover object</a>.<br>"
 		dat += "<a href='?src=\ref[src];allitems=1'>Recover all objects</a>.<br>"
 
-	user << browse(dat, "window=cryopod_console")
+	show_browser(user, dat, "window=cryopod_console")
 	onclose(user, "cryopod_console")
 
 /obj/machinery/computer/cryopod/OnTopic(user, href_list, state)
@@ -97,7 +91,7 @@
 			to_chat(user, "<span class='notice'>\The [I] is no longer in storage.</span>")
 			return TOPIC_HANDLED
 
-		visible_message("<span class='notice'>The console beeps happily as it disgorges \the [I].</span>", 3)
+		visible_message("<span class='notice'>The console beeps happily as it disgorges \the [I].</span>", range = 3)
 
 		I.dropInto(loc)
 		frozen_items -= I
@@ -110,21 +104,19 @@
 			to_chat(user, "<span class='notice'>There is nothing to recover from storage.</span>")
 			return TOPIC_HANDLED
 
-		visible_message("<span class='notice'>The console beeps happily as it disgorges the desired objects.</span>", 3)
+		visible_message("<span class='notice'>The console beeps happily as it disgorges the desired objects.</span>", range = 3)
 
 		for(var/obj/item/I in frozen_items)
 			I.dropInto(loc)
 			frozen_items -= I
 		. = TOPIC_REFRESH
 
-	attack_hand(user)
-
-/obj/item/weapon/circuitboard/cryopodcontrol
+/obj/item/weapon/stock_parts/circuitboard/cryopodcontrol
 	name = "Circuit board (Cryogenic Oversight Console)"
 	build_path = /obj/machinery/computer/cryopod
 	origin_tech = list(TECH_DATA = 3)
 
-/obj/item/weapon/circuitboard/robotstoragecontrol
+/obj/item/weapon/stock_parts/circuitboard/robotstoragecontrol
 	name = "Circuit board (Robotic Storage Console)"
 	build_path = /obj/machinery/computer/cryopod/robot
 	origin_tech = list(TECH_DATA = 3)
@@ -212,8 +204,8 @@
 	. = ..()
 	airtank = new()
 	airtank.temperature = T0C
-	airtank.adjust_gas("oxygen", MOLES_O2STANDARD, 0)
-	airtank.adjust_gas("nitrogen", MOLES_N2STANDARD)
+	airtank.adjust_gas(GAS_OXYGEN, MOLES_O2STANDARD, 0)
+	airtank.adjust_gas(GAS_NITROGEN, MOLES_N2STANDARD)
 
 /obj/machinery/cryopod/lifepod/return_air()
 	return airtank
@@ -229,9 +221,9 @@
 
 	var/list/possible_locations = list()
 	if(GLOB.using_map.use_overmap)
-		var/obj/effect/overmap/O = map_sectors["[z]"]
-		for(var/obj/effect/overmap/OO in range(O,2))
-			if(OO.in_space || istype(OO,/obj/effect/overmap/sector/exoplanet))
+		var/obj/effect/overmap/visitable/O = map_sectors["[z]"]
+		for(var/obj/effect/overmap/visitable/OO in range(O,2))
+			if(OO.in_space || istype(OO,/obj/effect/overmap/visitable/sector/exoplanet))
 				possible_locations |= text2num(level)
 
 	var/newz = GLOB.using_map.get_empty_zlevel()
@@ -273,8 +265,7 @@
 
 	// Don't send messages unless we *need* the computer, and less than five minutes have passed since last time we messaged
 	if(!control_computer && urgent && last_no_computer_message + 5*60*10 < world.time)
-		log_admin("Cryopod in [src.loc.loc] could not find control computer!")
-		message_admins("Cryopod in [src.loc.loc] could not find control computer!")
+		log_and_message_admins("Cryopod in [src.loc.loc] could not find control computer!")
 		last_no_computer_message = world.time
 
 	return control_computer != null
@@ -296,13 +287,13 @@
 
 /obj/machinery/cryopod/examine(mob/user)
 	. = ..()
-	if (. && occupant && user.Adjacent(src))
-		occupant.examine(user)
+	if (occupant && user.Adjacent(src))
+		occupant.examine(arglist(args))
 
-//Lifted from Unity stasis.dm and refactored. ~Zuhayr
+//Lifted from Unity stasis.dm and refactored.
 /obj/machinery/cryopod/Process()
 	if(occupant)
-		if(applies_stasis && iscarbon(occupant))
+		if(applies_stasis && iscarbon(occupant) && (world.time > time_entered + 20 SECONDS))
 			var/mob/living/carbon/C = occupant
 			C.SetStasis(2)
 
@@ -351,6 +342,7 @@
 	var/list/items = src.contents.Copy()
 	items -= occupant // Don't delete the occupant
 	items -= announce // or the autosay radio.
+	items -= component_parts
 
 	for(var/obj/item/W in items)
 
@@ -419,7 +411,7 @@
 	log_and_message_admins("[key_name(occupant)] ([role_alt_title]) entered cryostorage.")
 
 	announce.autosay("[occupant.real_name], [role_alt_title], [on_store_message]", "[on_store_name]")
-	visible_message("<span class='notice'>\The [initial(name)] hums and hisses as it moves [occupant.real_name] into storage.</span>", 3)
+	visible_message("<span class='notice'>\The [initial(name)] hums and hisses as it moves [occupant.real_name] into storage.</span>", range = 3)
 
 	//This should guarantee that ghosts don't spawn.
 	occupant.ckey = null
@@ -433,8 +425,8 @@
 		if(target != user)
 			if(alert(target,"Would you like to enter long-term storage?",,"Yes","No") != "Yes")
 				return
-	if(!user.incapacitated() && user.Adjacent(src) && user.Adjacent(target))
-		visible_message("[user] starts putting [target] into \the [src].", 3)
+	if(!user.incapacitated() && !user.anchored && user.Adjacent(src) && user.Adjacent(target))
+		visible_message("[user] starts putting [target] into \the [src].", range = 3)
 		if(!do_after(user, 20, src)|| QDELETED(target))
 			return
 		set_occupant(target)
@@ -482,7 +474,7 @@
 	icon_state = base_icon_state
 
 	//Eject any items that aren't meant to be in the pod.
-	var/list/items = src.contents
+	var/list/items = contents - component_parts
 	if(occupant) items -= occupant
 	if(announce) items -= announce
 
@@ -512,7 +504,7 @@
 			to_chat(usr, "You're too busy getting your life sucked out of you.")
 			return
 
-	visible_message("[usr] starts climbing into \the [src].", 3)
+	visible_message("\The [usr] starts climbing into \the [src].", range = 3)
 
 	if(do_after(usr, 20, src))
 
@@ -566,3 +558,43 @@
 
 /obj/machinery/cryopod/relaymove(var/mob/user)
 	go_out()
+
+//A prop version for away missions and such
+
+/obj/structure/broken_cryo
+	name = "broken cryo sleeper"
+	desc = "Whoever was inside isn't going to wake up now. It looks like you could pry it open with a crowbar."
+	icon = 'icons/obj/Cryogenic2.dmi'
+	icon_state = "broken_cryo"
+	anchored = 1
+	density = 1
+	var/closed = 1
+	var/busy = 0
+	var/remains_type = /obj/item/remains/human
+
+/obj/structure/broken_cryo/attack_hand(mob/user)
+	..()
+	if (closed)
+		to_chat(user, "<span class='notice'>You tug at the glass but can't open it with your hands alone.</span>")
+	else
+		to_chat(user, "<span class='notice'>The glass is already open.</span>")
+
+/obj/structure/broken_cryo/attackby(obj/item/W as obj, mob/user as mob)
+	if (busy)
+		to_chat(user, "<span class='notice'>Someone else is attempting to open this.</span>")
+		return
+	if (closed)
+		if (isCrowbar(W))
+			busy = 1
+			visible_message("[user] starts to pry the glass cover off of \the [src].")
+			if (!do_after(user, 50, src))
+				visible_message("[user] stops trying to pry the glass off of \the [src].")
+				busy = 0
+				return
+			closed = 0
+			busy = 0
+			icon_state = "broken_cryo_open"
+			var/obj/dead = new remains_type(loc)
+			dead.dir = src.dir//skeleton is oriented as cryo
+	else
+		to_chat(user, "<span class='notice'>The glass cover is already open.</span>")

@@ -29,10 +29,11 @@
 				message = sanitize(input("Enter an emote to display.") as text|null)
 			if(!message)
 				return
-			if(alert(src, "Is this an audible emote?", "Emote", "Yes", "No") == "No")
-				m_type = VISIBLE_MESSAGE
-			else
-				m_type = AUDIBLE_MESSAGE
+			if (!m_type)
+				if(alert(src, "Is this an audible emote?", "Emote", "Yes", "No") == "No")
+					m_type = VISIBLE_MESSAGE
+				else
+					m_type = AUDIBLE_MESSAGE
 			return custom_emote(m_type, message)
 
 	var/splitpoint = findtext(act, " ")
@@ -76,7 +77,7 @@
 	name_anchor = findtext(message, anchor_char)
 	if(name_anchor > 0) // User supplied emote with visible_emote token (default ^)
 		pretext = copytext(message, 1, name_anchor)
-		subtext = copytext(message, name_anchor + 1, lentext(message) + 1)
+		subtext = copytext(message, name_anchor + 1, length(message) + 1)
 	else
 		// No token. Just the emote as usual.
 		subtext = message
@@ -89,12 +90,12 @@
 
 	if(pretext)
 		// Add a space at the end if we didn't already supply one.
-		end_char = copytext(pretext, lentext(pretext), lentext(pretext) + 1)
+		end_char = copytext(pretext, length(pretext), length(pretext) + 1)
 		if(end_char != " ")
 			pretext += " "
 
 	// Grab the last character of the emote message.
-	end_char = copytext(subtext, lentext(subtext), lentext(subtext) + 1)
+	end_char = copytext(subtext, length(subtext), length(subtext) + 1)
 	if(!(end_char in list(".", "?", "!", "\"", "-", "~"))) // gotta include ~ for all you fucking weebs
 		// No punctuation supplied. Tack a period on the end.
 		subtext += "."

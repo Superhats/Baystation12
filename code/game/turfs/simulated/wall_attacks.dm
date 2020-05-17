@@ -76,8 +76,6 @@
 			dismantle_wall()
 			return 1
 
-	if(..()) return 1
-
 	if(!can_open)
 		to_chat(user, "<span class='notice'>You push \the [src], but nothing happens.</span>")
 		playsound(src, hitsound, 25, 1)
@@ -99,7 +97,26 @@
 			fail_smash(user)
 			return 1
 
-	try_touch(user, rotting)
+	if(iscarbon(user))
+		var/mob/living/carbon/M = user
+		switch(M.a_intent)
+			if(I_HELP)
+				return
+			if(I_DISARM, I_GRAB)
+				try_touch(M, rotting)
+			if(I_HURT)
+				if (!(M.organs_by_name[M.hand ? BP_L_HAND : BP_R_HAND].is_usable()))
+					to_chat(user, SPAN_WARNING("You can't use that hand."))
+					return
+				if(rotting && !reinf_material)
+					M.visible_message(SPAN_DANGER("[M.name] punches \the [src] and it crumbles!"), SPAN_DANGER("You punch \the [src] and it crumbles!"))
+					dismantle_wall()
+				else
+					M.visible_message(SPAN_DANGER("[M.name] punches \the [src]!"), SPAN_DANGER("You punch \the [src]!"))
+					M.apply_damage(3, BRUTE, M.hand ? BP_L_HAND : BP_R_HAND)
+
+	else
+		try_touch(user, rotting)
 
 /turf/simulated/wall/attack_generic(var/mob/user, var/damage, var/attack_message, var/wallbreaker)
 
@@ -185,18 +202,12 @@
 
 		var/obj/item/weapon/weldingtool/WT = W
 
-		if(!WT.isOn())
-			return
-
 		if(WT.remove_fuel(0,user))
 			to_chat(user, "<span class='notice'>You start repairing the damage to [src].</span>")
 			playsound(src, 'sound/items/Welder.ogg', 100, 1)
 			if(do_after(user, max(5, damage / 5), src) && WT && WT.isOn())
 				to_chat(user, "<span class='notice'>You finish repairing the damage to [src].</span>")
 				take_damage(-damage)
-		else
-			to_chat(user, "<span class='notice'>You need more welding fuel to complete this task.</span>")
-			return
 		return
 
 	// Basic dismantling.
@@ -208,15 +219,16 @@
 
 		if(istype(W,/obj/item/weapon/weldingtool))
 			var/obj/item/weapon/weldingtool/WT = W
-			if(!WT.isOn())
-				return
 			if(!WT.remove_fuel(0,user))
-				to_chat(user, "<span class='notice'>You need more welding fuel to complete this task.</span>")
 				return
 			dismantle_verb = "cutting"
 			dismantle_sound = 'sound/items/Welder.ogg'
 			cut_delay *= 0.7
-		else if(istype(W,/obj/item/weapon/melee/energy/blade) || istype(W,/obj/item/psychic_power/psiblade/master))
+		else if(istype(W,/obj/item/weapon/melee/energy/blade) || istype(W,/obj/item/psychic_power/psiblade/master) || istype(W, /obj/item/weapon/gun/energy/plasmacutter))
+			if(istype(W, /obj/item/weapon/gun/energy/plasmacutter))
+				var/obj/item/weapon/gun/energy/plasmacutter/cutter = W
+				if(!cutter.slice(user))
+					return
 			dismantle_sound = "sparks"
 			dismantle_verb = "slicing"
 			cut_delay *= 0.5
@@ -280,8 +292,7 @@
 					return
 				else if( istype(W, /obj/item/stack/material/rods) )
 					var/obj/item/stack/O = W
-					if(O.get_amount()>0)
-						O.use(1)
+					if(O.use(1))
 						construction_stage = 6
 						update_icon()
 						to_chat(user, "<span class='notice'>You replace the outer grille.</span>")
@@ -290,14 +301,15 @@
 				var/cut_cover
 				if(istype(W,/obj/item/weapon/weldingtool))
 					var/obj/item/weapon/weldingtool/WT = W
-					if(!WT.isOn())
-						return
 					if(WT.remove_fuel(0,user))
 						cut_cover=1
 					else
-						to_chat(user, "<span class='notice'>You need more welding fuel to complete this task.</span>")
 						return
 				else if (istype(W, /obj/item/weapon/gun/energy/plasmacutter) || istype(W, /obj/item/psychic_power/psiblade/master))
+					if(istype(W, /obj/item/weapon/gun/energy/plasmacutter))
+						var/obj/item/weapon/gun/energy/plasmacutter/cutter = W
+						if(!cutter.slice(user))
+							return
 					cut_cover = 1
 				if(cut_cover)
 					to_chat(user, "<span class='notice'>You begin slicing through the metal cover.</span>")
@@ -335,9 +347,12 @@
 					if( WT.remove_fuel(0,user) )
 						cut_cover=1
 					else
-						to_chat(user, "<span class='notice'>You need more welding fuel to complete this task.</span>")
 						return
 				else if(istype(W, /obj/item/weapon/gun/energy/plasmacutter) || istype(W,/obj/item/psychic_power/psiblade/master))
+					if(istype(W, /obj/item/weapon/gun/energy/plasmacutter))
+						var/obj/item/weapon/gun/energy/plasmacutter/cutter = W
+						if(!cutter.slice(user))
+							return
 					cut_cover = 1
 				if(cut_cover)
 					to_chat(user, "<span class='notice'>You begin slicing through the support rods.</span>")

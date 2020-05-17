@@ -17,10 +17,13 @@
 /decl/closet_appearance/secure_closet/torch/medical/cmo
 	extra_decals = list(
 		"stripe_vertical_left_full" = COLOR_BABY_BLUE,
-		"stripe_vertical_mid_full" = COLOR_GOLD,
+		"stripe_vertical_mid_full" = COLOR_CLOSET_GOLD,
 		"stripe_vertical_right_full" = COLOR_BABY_BLUE,
-		"medical" = COLOR_GOLD
+		"medical" = COLOR_CLOSET_GOLD
 	)
+
+/obj/structure/closet/secure_closet/counselor
+	closet_appearance = /decl/closet_appearance/secure_closet/torch/medical
 
 /obj/structure/closet/secure_closet/CMO_torch
 	name = "chief medical officer's locker"
@@ -37,6 +40,7 @@
 		/obj/item/device/radio/headset/heads/cmo,
 		/obj/item/device/radio/headset/heads/cmo/alt,
 		/obj/item/device/flash,
+		/obj/item/weapon/gun/energy/confuseray,
 		/obj/item/device/megaphone,
 		/obj/item/weapon/reagent_containers/hypospray/vial,
 		/obj/item/weapon/storage/fancy/vials,
@@ -50,6 +54,7 @@
 		/obj/item/weapon/storage/firstaid/adv,
 		/obj/item/weapon/storage/box/armband/med,
 		/obj/item/weapon/storage/belt/general,
+		/obj/item/weapon/material/knife/folding/swiss/officer,
 		new /datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/medic, /obj/item/weapon/storage/backpack/satchel/med)),
 		new /datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/dufflebag/med, /obj/item/weapon/storage/backpack/messenger/med)),
 		RANDOM_SCRUBS
@@ -78,6 +83,7 @@
 		/obj/item/device/flash,
 		/obj/item/device/megaphone,
 		/obj/item/weapon/storage/firstaid/adv,
+		/obj/item/weapon/material/knife/folding/swiss/medic,
 		new /datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/medic, /obj/item/weapon/storage/backpack/satchel/med)),
 		new /datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/dufflebag/med, /obj/item/weapon/storage/backpack/messenger/med)),
 		RANDOM_SCRUBS = 2
@@ -106,6 +112,7 @@
 		/obj/item/weapon/storage/firstaid/adv,
 		/obj/item/clothing/suit/storage/medical_chest_rig,
 		/obj/item/clothing/head/hardhat/EMS,
+		/obj/item/weapon/material/knife/folding/swiss/medic,
 		new /datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/medic, /obj/item/weapon/storage/backpack/satchel/med)),
 		new /datum/atom_creator/weighted(list(/obj/item/weapon/storage/backpack/dufflebag/med, /obj/item/weapon/storage/backpack/messenger/med))
 	)
@@ -120,6 +127,5 @@
 		RANDOM_SCRUBS = 4,
 		/obj/item/clothing/suit/surgicalapron = 2,
 		/obj/item/clothing/shoes/white = 2,
-		/obj/item/clothing/suit/storage/toggle/labcoat = 2,
 		/obj/item/clothing/mask/surgical = 2
 	)

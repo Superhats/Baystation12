@@ -1,3 +1,4 @@
+
 // folding/locking knives
 /obj/item/weapon/material/knife/folding
 	name = "pocketknife"
@@ -6,7 +7,8 @@
 	icon_state = "knife_preview"
 	item_state = null
 	force = 0.2 //force of folded obj
-	force_divisor = 0.1 //force 6 when made of steel
+	max_force = 10
+	force_divisor = 0.2
 	applies_material_colour = FALSE
 	applies_material_name = FALSE
 	unbreakable = TRUE
@@ -22,7 +24,7 @@
 	var/hardware_open = "basic_hardware"
 	var/handle_icon = "basic_handle"
 
-	var/closed_attack_verbs = list("prodded", "tapped") //initial doesnt work with lists, rip
+	var/closed_attack_verbs = list("prodded", "tapped") //initial doesn't work with lists, rip
 	var/valid_colors = list(COLOR_DARK_GRAY, COLOR_RED_GRAY, COLOR_BLUE_GRAY, COLOR_DARK_BLUE_GRAY, COLOR_GREEN_GRAY, COLOR_DARK_GREEN_GRAY)
 
 /obj/item/weapon/material/knife/folding/Initialize()
@@ -91,10 +93,12 @@
 /obj/item/weapon/material/knife/folding/combat //master obj
 	name = "the concept of a fighting knife in which the blade can be stowed in its own handle"
 	desc = "This is a master item - berate the admin or mapper who spawned this"
-	force_divisor = 0.25 // 15 when wielded with hardness 60 (steel)
-	thrown_force_divisor = 0.25 // 5 when thrown with weight 20 (steel)
+	max_force = 15
+	force_divisor = 0.25
+	thrown_force_divisor = 0.25
 	attack_cooldown_modifier = -1
 	takes_colour = FALSE
+	worth_multiplier = 8
 
 /obj/item/weapon/material/knife/folding/combat/balisong
 	name = "butterfly knife"

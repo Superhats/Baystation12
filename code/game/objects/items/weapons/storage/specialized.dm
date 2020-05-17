@@ -38,7 +38,10 @@
 	can_hold = list(
 		/obj/item/weapon/sample,
 		/obj/item/weapon/evidencebag,
-		/obj/item/weapon/forensics
+		/obj/item/weapon/forensics,
+		/obj/item/weapon/photo,
+		/obj/item/weapon/paper,
+		/obj/item/weapon/paper_bundle
 	)
 	allow_quick_gather = 1
 	allow_quick_empty = 1
@@ -157,7 +160,7 @@
 		if(!istype(S)) return 0
 
 		//I would prefer to drop a new stack, but the item/attack_hand code
-		// that calls this can't recieve a different object than you clicked on.
+		// that calls this can't receive a different object than you clicked on.
 		//Therefore, make a new stack internally that has the remainder.
 		// -Sayu
 

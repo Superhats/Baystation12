@@ -23,6 +23,21 @@
 	name = OUTFIT_JOB_NAME("Physician - Contractor")
 	id_type = /obj/item/weapon/card/id/torch/contractor/medical/senior
 
+/decl/hierarchy/outfit/job/torch/crew/medical/junior
+	name = OUTFIT_JOB_NAME("Medical Resident")
+	uniform = /obj/item/clothing/under/solgov/utility/expeditionary/officer/medical
+	shoes = /obj/item/clothing/shoes/dutyboots
+	id_type = /obj/item/weapon/card/id/torch/crew/medical/senior
+
+/decl/hierarchy/outfit/job/torch/crew/medical/junior/fleet
+	name = OUTFIT_JOB_NAME("Medical Resident - Fleet")
+	uniform = /obj/item/clothing/under/solgov/utility/fleet/medical
+	shoes = /obj/item/clothing/shoes/dutyboots
+
+/decl/hierarchy/outfit/job/torch/crew/medical/contractor/junior
+	name = OUTFIT_JOB_NAME("Medical Resident - Contractor")
+	id_type = /obj/item/weapon/card/id/torch/contractor/medical/senior
+
 /decl/hierarchy/outfit/job/torch/crew/medical/doctor
 	name = OUTFIT_JOB_NAME("Medical Technician")
 	uniform = /obj/item/clothing/under/solgov/utility/expeditionary/medical
@@ -46,14 +61,6 @@
 	name = OUTFIT_JOB_NAME("Mortician")
 	uniform = /obj/item/clothing/under/rank/medical/scrubs/black
 
-/decl/hierarchy/outfit/job/torch/crew/medical/biomech
-	name = OUTFIT_JOB_NAME("Biomechanical Engineer")
-	uniform = /obj/item/clothing/under/rank/medical/scrubs/black
-	shoes = /obj/item/clothing/shoes/black
-	l_ear = /obj/item/device/radio/headset/torchroboticist
-	id_type = /obj/item/weapon/card/id/torch/contractor/biomech
-	pda_type = /obj/item/modular_computer/pda/roboticist
-
 /decl/hierarchy/outfit/job/torch/crew/medical/contractor/paramedic
 	name = OUTFIT_JOB_NAME("Paramedic - Torch")
 	uniform = /obj/item/clothing/under/rank/medical/paramedic
@@ -64,14 +71,10 @@
 
 /decl/hierarchy/outfit/job/torch/crew/medical/contractor/chemist
 	name = OUTFIT_JOB_NAME("Chemist - Torch")
-	uniform = /obj/item/clothing/under/rank/chemist
+	uniform = /obj/item/clothing/under/rank/medical
 	shoes = /obj/item/clothing/shoes/white
-	pda_type = /obj/item/modular_computer/pda/chemistry
+	pda_type = /obj/item/modular_computer/pda/medical
 	id_type = /obj/item/weapon/card/id/torch/contractor/chemist
-
-/decl/hierarchy/outfit/job/torch/crew/medical/contractor/chemist/New()
-	..()
-	BACKPACK_OVERRIDE_CHEMISTRY
 
 /decl/hierarchy/outfit/job/torch/crew/medical/counselor
 	name = OUTFIT_JOB_NAME("Counselor")
@@ -79,13 +82,15 @@
 	shoes = /obj/item/clothing/shoes/white
 	id_type = /obj/item/weapon/card/id/torch/contractor/medical/counselor
 
-/decl/hierarchy/outfit/job/torch/crew/medical/counselor/psychiatrist
-	name = OUTFIT_JOB_NAME("Psychiatrist - Torch")
-	uniform = /obj/item/clothing/under/rank/psych
-
-/decl/hierarchy/outfit/job/torch/crew/medical/counselor/chaplain
-	name = OUTFIT_JOB_NAME("Chaplain - Torch")
-	uniform = /obj/item/clothing/under/rank/chaplain
+/decl/hierarchy/outfit/job/torch/crew/medical/counselor/equip_id(var/mob/living/carbon/human/H, var/rank, var/assignment, var/equip_adjustments)
+	. = ..()
+	var/obj/item/weapon/card/id/foundation_civilian/regis_card = new
+	if(rank)
+		regis_card.rank = rank
+	if(assignment)
+		regis_card.assignment = assignment
+	H.set_id_info(regis_card)
+	H.equip_to_slot_or_store_or_drop(regis_card)
 
 /decl/hierarchy/outfit/job/torch/crew/medical/counselor/ec
 	name = OUTFIT_JOB_NAME("Counselor - Expeditionary Corps")
@@ -96,3 +101,8 @@
 	name = OUTFIT_JOB_NAME("Counselor - Fleet")
 	uniform = /obj/item/clothing/under/solgov/utility/fleet/medical
 	shoes = /obj/item/clothing/shoes/dutyboots
+
+/decl/hierarchy/outfit/job/torch/crew/medical/counselor/mentalist
+	name = OUTFIT_JOB_NAME("Counselor - Mentalist")
+	suit = /obj/item/clothing/suit/storage/toggle/labcoat
+	shoes = /obj/item/clothing/shoes/laceup

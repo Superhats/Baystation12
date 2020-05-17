@@ -1,3 +1,5 @@
+var/global/list/empty_playable_ai_cores = list()
+
 /obj/structure/AIcore
 	density = 1
 	anchored = 0
@@ -6,7 +8,7 @@
 	icon_state = "0"
 	var/state = 0
 	var/datum/ai_laws/laws = new /datum/ai_laws/nanotrasen
-	var/obj/item/weapon/circuitboard/circuit = null
+	var/obj/item/weapon/stock_parts/circuitboard/circuit = null
 	var/obj/item/device/mmi/brain = null
 	var/authorized
 
@@ -49,7 +51,7 @@
 					to_chat(user, "<span class='notice'>You unfasten the frame.</span>")
 					anchored = 0
 					state = 0
-			if(istype(P, /obj/item/weapon/circuitboard/aicore) && !circuit && user.unEquip(P, src))
+			if(istype(P, /obj/item/weapon/stock_parts/circuitboard/aicore) && !circuit && user.unEquip(P, src))
 				playsound(loc, 'sound/items/Deconstruct.ogg', 50, 1)
 				to_chat(user, "<span class='notice'>You place the circuit board inside the frame.</span>")
 				icon_state = "1"

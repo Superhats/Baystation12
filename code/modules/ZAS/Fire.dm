@@ -124,7 +124,6 @@ turf/proc/hotspot_expose(exposed_temperature, exposed_volume, soh = 0)
 	icon = 'icons/effects/fire.dmi'
 	icon_state = "1"
 	light_color = "#ed9200"
-	plane = EFFECTS_BELOW_LIGHTING_PLANE
 	layer = FIRE_LAYER
 
 	var/firelevel = 1 //Calculated by gas_mixture.calculate_firelevel()
@@ -321,6 +320,9 @@ turf/proc/hotspot_expose(exposed_temperature, exposed_volume, soh = 0)
 		log_debug("new temperature = [temperature]; new pressure = [return_pressure()]")
 		#endif
 
+		if (temperature<220)
+			firelevel = 0
+
 		return firelevel
 
 datum/gas_mixture/proc/check_recombustability(list/fuel_objs)
@@ -394,6 +396,7 @@ datum/gas_mixture/proc/check_recombustability(list/fuel_objs)
 /mob/living/proc/FireBurn(var/firelevel, var/last_temperature, var/pressure)
 	var/mx = 5 * firelevel/vsc.fire_firelevel_multiplier * min(pressure / ONE_ATMOSPHERE, 1)
 	apply_damage(2.5*mx, BURN)
+	return mx
 
 
 /mob/living/carbon/human/FireBurn(var/firelevel, var/last_temperature, var/pressure)
@@ -423,7 +426,7 @@ datum/gas_mixture/proc/check_recombustability(list/fuel_objs)
 				legs_exposure = 0
 			if(C.body_parts_covered & ARMS)
 				arms_exposure = 0
-	//minimize this for low-pressure enviroments
+	//minimize this for low-pressure environments
 	var/mx = 5 * firelevel/vsc.fire_firelevel_multiplier * min(pressure / ONE_ATMOSPHERE, 1)
 
 	//Always check these damage procs first if fire damage isn't working. They're probably what's wrong.
@@ -435,3 +438,6 @@ datum/gas_mixture/proc/check_recombustability(list/fuel_objs)
 	apply_damage(0.6*mx*legs_exposure,  BURN, BP_R_LEG, used_weapon =  "Fire")
 	apply_damage(0.4*mx*arms_exposure,  BURN, BP_L_ARM, used_weapon =  "Fire")
 	apply_damage(0.4*mx*arms_exposure,  BURN, BP_R_ARM, used_weapon =  "Fire")
+
+	//return a truthy value of whether burning actually happened
+	return mx * (head_exposure + chest_exposure + groin_exposure + legs_exposure + arms_exposure)

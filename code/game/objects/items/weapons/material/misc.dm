@@ -5,11 +5,14 @@
 	edge = 1
 	icon_state = "harpoon"
 	item_state = "harpoon"
+	max_force = 20
 	force_divisor = 0.3 // 18 with hardness 60 (steel)
 	thrown_force_divisor = 1.8
 	attack_verb = list("jabbed","stabbed","ripped")
 	does_spin = FALSE
 	var/spent
+	worth_multiplier = 15
+
 
 /obj/item/weapon/material/harpoon/bomb
 	name = "explosive harpoon"
@@ -39,12 +42,14 @@
 	thrown_force_divisor = 0.3
 	sharp = FALSE
 	edge = FALSE
+	worth_multiplier = 6
 
 /obj/item/weapon/material/hatchet
 	name = "hatchet"
 	desc = "A very sharp axe blade upon a short fibremetal handle. It has a long history of chopping things, but now it is used for chopping wood."
 	icon = 'icons/obj/weapons.dmi'
 	icon_state = "hatchet"
+	max_force = 15
 	force_divisor = 0.2 // 12 with hardness 60 (steel)
 	thrown_force_divisor = 0.75 // 15 with weight 20 (steel)
 	w_class = ITEM_SIZE_SMALL
@@ -67,6 +72,7 @@
 	default_material = MATERIAL_TITANIUM
 	base_parry_chance = 50
 	attack_cooldown_modifier = 1
+	max_force = 20
 	force_divisor = 0.20 //20 with hardness 80 (titanium) or 15 with hardness 60 (steel)
 
 /obj/item/weapon/material/hatchet/machete/unbreakable
@@ -97,6 +103,7 @@
 	icon = 'icons/obj/weapons.dmi'
 	icon_state = "hoe"
 	item_state = "hoe"
+	max_force = 5
 	force_divisor = 0.25 // 5 with weight 20 (steel)
 	thrown_force_divisor = 0.25 // as above
 	w_class = ITEM_SIZE_SMALL
@@ -109,6 +116,7 @@
 	icon_state = "scythe0"
 	name = "scythe"
 	desc = "A sharp and curved blade on a long fibremetal handle, this tool makes it easy to reap what you sow."
+	max_force = 15
 	force_divisor = 0.275 // 16 with hardness 60 (steel)
 	thrown_force_divisor = 0.25 // 5 with weight 20 (steel)
 	sharp = 1
@@ -119,5 +127,24 @@
 	slot_flags = SLOT_BACK
 	origin_tech = list(TECH_MATERIAL = 2, TECH_COMBAT = 2)
 	attack_verb = list("chopped", "sliced", "cut", "reaped")
+	worth_multiplier = 20
 
 
+/obj/item/weapon/material/cross
+	name = "cross"
+	desc = "It's a cross, commonly used as a holy symbol by Christians."
+	icon_state = "cross"
+	max_force = 5
+	force_divisor = 0.1
+	thrown_force_divisor = 0.1
+	w_class = ITEM_SIZE_SMALL
+	attack_verb = list("attacked", "bashed")
+
+/obj/item/weapon/material/cross/wood
+	default_material = MATERIAL_WOOD
+
+/obj/item/weapon/material/cross/silver
+	default_material = MATERIAL_SILVER
+
+/obj/item/weapon/material/cross/gold
+	default_material = MATERIAL_GOLD

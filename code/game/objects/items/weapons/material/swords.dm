@@ -6,6 +6,7 @@
 	slot_flags = SLOT_BELT
 	w_class = ITEM_SIZE_LARGE
 	force_divisor = 0.5 // 30 when wielded with hardnes 60 (steel)
+	armor_penetration = 10
 	thrown_force_divisor = 0.5 // 10 when thrown with weight 20 (steel)
 	sharp = 1
 	edge = 1
@@ -13,12 +14,15 @@
 	hitsound = 'sound/weapons/bladeslice.ogg'
 	base_parry_chance = 50
 	melee_accuracy_bonus = 10
+	worth_multiplier = 30
 
 /obj/item/weapon/material/sword/replica
+	max_force = 10
 	edge = 0
 	sharp = 0
 	force_divisor = 0.2
 	thrown_force_divisor = 0.2
+	worth_multiplier = 15
 
 /obj/item/weapon/material/sword/katana
 	name = "katana"
@@ -29,6 +33,7 @@
 	slot_flags = SLOT_BELT | SLOT_BACK
 
 /obj/item/weapon/material/sword/katana/replica
+	max_force = 10
 	edge = 0
 	sharp = 0
 	force_divisor = 0.2

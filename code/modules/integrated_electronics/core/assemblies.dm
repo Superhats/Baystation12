@@ -29,7 +29,6 @@
 	var/components_per_page = 5
 	health = 30
 	pass_flags = 0
-	armor = list("melee" = 50, "bullet" = 70, "laser" = 70, "energy" = 100, "bomb" = 10, "bio" = 100, "rad" = 100, "fire" = 0, "acid" = 0)
 	anchored = FALSE
 	var/detail_color = COLOR_ASSEMBLY_BLACK
 	var/list/color_whitelist = list( //This is just for checking that hacked colors aren't in the save data.
@@ -53,8 +52,6 @@
 
 /obj/item/device/electronic_assembly/examine(mob/user)
 	. = ..()
-	if(!.)
-		return
 	if(IC_FLAG_ANCHORABLE & circuit_flags)
 		to_chat(user, "<span class='notice'>The anchoring bolts [anchored ? "are" : "can be"] <b>wrenched</b> in place and the maintenance panel [opened ? "can be" : "is"] <b>screwed</b> in place.</span>")
 	else
@@ -166,8 +163,6 @@
 
 
 /obj/item/device/electronic_assembly/proc/open_interact(mob/user)
-	. = ..()
-
 	var/total_part_size = return_total_size()
 	var/total_complexity = return_total_complexity()
 	var/list/HTML = list()
@@ -301,7 +296,7 @@
 	overlays += detail_overlay
 
 /obj/item/device/electronic_assembly/examine(mob/user)
-	..()
+	. = ..()
 	for(var/I in assembly_components)
 		var/obj/item/integrated_circuit/IC = I
 		IC.external_examine(user)
@@ -462,6 +457,17 @@
 		detail_color = D.detail_color
 		update_icon()
 	else if(istype(I, /obj/item/weapon/screwdriver))
+		var/hatch_locked = FALSE
+		for(var/obj/item/integrated_circuit/manipulation/hatchlock/H in assembly_components)
+			// If there's more than one hatch lock, only one needs to be enabled for the assembly to be locked
+			if(H.lock_enabled)
+				hatch_locked = TRUE
+				break
+
+		if(hatch_locked)
+			to_chat(user, "<span class='notice'>The screws are covered by a locking mechanism!</span>")
+			return FALSE
+
 		playsound(src, 'sound/items/Screwdriver.ogg', 25)
 		opened = !opened
 		to_chat(user, "<span class='notice'>You [opened ? "open" : "close"] the maintenance hatch of [src].</span>")
@@ -508,11 +514,6 @@
 // Override in children for special behavior.
 /obj/item/device/electronic_assembly/proc/get_object()
 	return src
-
-/obj/item/device/electronic_assembly/attack_tk(mob/user)
-	if(anchored)
-		return
-	..()
 
 /obj/item/device/electronic_assembly/attack_hand(mob/user)
 	if(anchored)
